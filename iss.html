@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISS mapping</title>
+    <link rel="stylesheet" href="iss.css">
+    <link rel="icon" href="photos/logo.png">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+    integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+    crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+    integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+    crossorigin=""></script></head>
+<body>
+    <h1>Where is the ISS ?</h1>
+
+    <div class="info">
+        <ul>
+            <li>Latitude: <span id="lat"></span></li>
+            <li>Longitude: <span id="lon"></span></li>
+            <li>Velocity: <span id="vel"></span></li>
+        </ul>
+    </div>
+
+    <div id="mapid" style="height: 350px;"></div>
+    <script type="text/javascript" src="http://maps.stamen.com/js/tile.stamen.js?v1.3.0"></script>
+
+    <script>
+        var mymap = L.map('mapid').setView([0, 0], 1);
+        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoia2FydGlrZW4iLCJhIjoiY2s5c2FodnZ1MDBlaDNtb2RmMG95Z2tnbCJ9.T5tK6-IS9zNBaSVyCzD0mQ', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            maxZoom: 1,
+            id: 'mapbox/streets-v11',
+            tileSize: 512,
+            zoomOffset: -1,
+            accessToken: 'your.mapbox.access.token'
+        }).addTo(mymap);
+        function onMapClick(e) {
+            popup
+                .setLatLng(e.latlng)
+                .setContent("You clicked the map at " + e.latlng.toString())
+                .openOn(mymap);
+        }
+        var popup = L.popup();
+        mymap.on('click', onMapClick);
+        var greenIcon = L.icon({
+        iconUrl: './photos/satellite.png',
+        // shadowUrl: './photos/shadow.png',
+
+        iconSize:     [44, 90], // size of the icon
+        shadowSize:   [20, 40], // size of the shadow
+        iconAnchor:   [25, 16], // point of the icon which will correspond to marker's location
+        shadowAnchor: [20, 2],  // the same for the shadow
+        popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+    });
+
+
+        const url='https://api.wheretheiss.at/v1/satellites/25544'
+        
+        async function getISS(){
+            let flag=0
+            const response = await fetch(url)
+            const jsonData = await response.json()
+
+            const {latitude,longitude,velocity} = jsonData
+
+            document.getElementById('lat').innerHTML=latitude.toFixed(2)+" &#xb0"
+            document.getElementById('lon').innerHTML=longitude.toFixed(2)+" &#xb0"
+            document.getElementById('vel').innerHTML=velocity.toFixed(2)+" kmph"
+            console.log(latitude,longitude,velocity)
+
+            if(flag==0)
+            {
+                mymap.setView([latitude,longitude],10)
+            }
+            L.marker([latitude, longitude], {icon: greenIcon}).addTo(mymap);
+            flag=1
+        } 
+        setInterval(getISS,1000)
+        // getISS()
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+body{
+    background-image: url('photos/bg.jpg');
+    background-size: cover;
+}
+h1{
+    color: rgb(240, 234, 234);
+    text-align: center;
+    font-family: cursive;
+    font-size: 170%;
+}
+.info{
+    background-color: rgb(240, 234, 234);
+}
+.info ul{
+    list-style:'\1F44D';
+}
+.info ul li{
+    padding: 2%;
+}
